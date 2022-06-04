@@ -100,8 +100,17 @@ class EventsController extends BaseController
     ]
      */
 
-    public function getEventsWithWorkshops() {
-        throw new \Exception('implement in coding task 1');
+    public function getEventsWithWorkshops() {       
+        $events = Event::all();
+        $eventsWithWorkshops = [];
+        foreach($events as $event){
+            $eventsWithWorkshops[$event['id']]['id']= $event['id'];
+            $eventsWithWorkshops[$event['id']]['name']= $event['name'];
+            $eventsWithWorkshops[$event['id']]['created_at']= $event['created_at'];
+            $eventsWithWorkshops[$event['id']]['updated_at']= $event['updated_at'];
+            $eventsWithWorkshops[$event['id']]['workshops'] =  \App\Models\Workshop::where('event_id', '=',$event['id'])->get();
+        }
+        return json_decode(json_encode($eventsWithWorkshops));        
     }
 
 
