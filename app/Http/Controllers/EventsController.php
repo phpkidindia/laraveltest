@@ -8,6 +8,8 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Carbon;
+
 
 class EventsController extends BaseController
 {
@@ -110,7 +112,7 @@ class EventsController extends BaseController
             $eventsWithWorkshops[$event['id']]['updated_at']= $event['updated_at'];
             $eventsWithWorkshops[$event['id']]['workshops'] =  \App\Models\Workshop::where('event_id', '=',$event['id'])->get();
         }
-        return json_decode(json_encode($eventsWithWorkshops));        
+        return $eventsWithWorkshops;
     }
 
 
@@ -189,6 +191,19 @@ class EventsController extends BaseController
      */
 
     public function getFutureEventsWithWorkshops() {
-        throw new \Exception('implement in coding task 2');
-    }
+        $date = (new Carbon());
+        $events = Event::all();
+        $eventsWithWorkshops = [];
+        foreach($events as $event){
+            $workshops = \App\Models\Workshop::where('event_id', '=',$event['id'])->where('start','>',$date)->get();
+            if(count($workshops) > 0){
+                $eventsWithWorkshops[$event['id']]['id']= $event['id'];
+                $eventsWithWorkshops[$event['id']]['name']= $event['name'];
+                $eventsWithWorkshops[$event['id']]['created_at']= $event['created_at'];
+                $eventsWithWorkshops[$event['id']]['updated_at']= $event['updated_at'];
+                $eventsWithWorkshops[$event['id']]['workshops'] = $workshops;
+            }            
+        }
+        return $eventsWithWorkshops;
+    }    
 }
